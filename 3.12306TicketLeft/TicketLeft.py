@@ -1,4 +1,4 @@
-# Ö»ĞèÔÚurlÌîÈëjsonÁ´½Ó£¬trainNOÌîÈë³µ´Î£¬¼´¿É·µ»ØÓ²ÎÔÆ±ÊıĞÅÏ¢£¬num²»ÓÃ¸Ä
+# åªéœ€åœ¨urlå¡«å…¥jsoné“¾æ¥ï¼ŒtrainNOå¡«å…¥è½¦æ¬¡ï¼Œå³å¯è¿”å›ç¡¬å§ç¥¨æ•°ä¿¡æ¯ï¼Œnumä¸ç”¨æ”¹
 
 import time
 import requests
@@ -12,19 +12,19 @@ from email.mime.text import MIMEText
 from email.utils import parseaddr, formataddr
 import smtplib
 
-url='https://kyfw.12306.cn/otn/leftTicket/queryO?leftTicketDTO.train_date=2018-04-02&leftTicketDTO.from_station=SYT&leftTicketDTO.to_station=GZQ&purpose_codes=ADULT'
-trainNO='Z1024'
+url='https://kyfw.12306.cn/otn/leftTicket/queryO?leftTicketDTO.train_date=2018-04-05&leftTicketDTO.from_station=SYT&leftTicketDTO.to_station=GZQ&purpose_codes=ADULT'
+trainNO='Z384'
 
 def sent(trainNO, ticketleft):
-    from_addr = 'user@139.com'
-    password = 'pw'
-    to_addr = 'user@139.com'
+    from_addr = '@139.com'
+    password = ''
+    to_addr = '@139.com'
     smtp_server = 'smtp.139.com'
 
-    msg = MIMEText('»ğ³µÆ±:%s:Ó²ÎÔ%s' % (trainNO , ticketleft), 'plain', 'utf-8')
-    msg['From'] = 'user@139.com'
-    msg['To'] = 'user@139.com'
-    msg['Subject'] = Header('%s:Ó²ÎÔ%s'% (trainNO , ticketleft), 'utf-8').encode()
+    msg = MIMEText('ç«è½¦ç¥¨:%s:ç¡¬å§%s' % (trainNO , ticketleft), 'plain', 'utf-8')
+    msg['From'] = '@139.com'
+    msg['To'] = '@139.com'
+    msg['Subject'] = Header('%s:ç¡¬å§%s'% (trainNO , ticketleft), 'utf-8').encode()
 
     server = smtplib.SMTP_SSL(smtp_server, 465)
     server.set_debuglevel(1)
@@ -48,9 +48,10 @@ def login():
         if x.find(trainNO)!=-1:
             print(x)
             trainmsg=x.split('|')
-            if trainmsg[28]!='ÎŞ':sent(trainNO,trainmsg[28]);return 'getit'
+            if trainmsg[28]!='æ— ':sent(trainNO,trainmsg[28]);return 'getit'
 
-# ------------------------------------------¿É×¢ÊÍ£¬ÓÃÓÚÑ¡ÔñÍ¬Ò»ÌË³µ¶àÈÕÆÚ------------------#
+# ------------------------------------------å¯æ³¨é‡Šï¼Œç”¨äºé€‰æ‹©åŒä¸€è¶Ÿè½¦å¤šæ—¥æœŸ------------------#
+    time.sleep(5)
     captchaurl ='https://kyfw.12306.cn/otn/leftTicket/queryO?leftTicketDTO.train_date=2018-04-03&leftTicketDTO.from_station=SYT&leftTicketDTO.to_station=GZQ&purpose_codes=ADULT'
     session = Session()
     checkcodecontent = session.get(captchaurl, headers=headers)
@@ -60,13 +61,22 @@ def login():
         if x.find(trainNO)!=-1:
             print(x)
             trainmsg=x.split('|')
-            if trainmsg[28]!='ÎŞ':sent(trainNO,trainmsg[28]);return 'getit'
-# ------------------------------------------¿É×¢ÊÍ£¬ÓÃÓÚÑ¡ÔñÍ¬Ò»ÌË³µ¶àÈÕÆÚ------------------#
+            if trainmsg[28]!='æ— ':sent(trainNO,trainmsg[28]);return 'getit'
+# ------------------------------------------å¯æ³¨é‡Šï¼Œç”¨äºé€‰æ‹©åŒä¸€è¶Ÿè½¦å¤šæ—¥æœŸ------------------#
 
-num = 0
-while True:
-    num=num+1
-    localtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    if (login() == 'getit'): break
-    print('µÚ%s´Î,%s'%(num,localtime))
-    time.sleep(3)
+
+def begin():
+    num = 0
+    while True:
+        num=num+1
+        localtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        try:
+            if (login() == 'getit'): break
+            print('ç¬¬%sæ¬¡,%s'%(num,localtime))
+            time.sleep(5)
+        except:
+            print('ç¬¬%sæ¬¡å‡ºé”™' % (num))
+            time.sleep(60)
+            begin()
+
+begin()
