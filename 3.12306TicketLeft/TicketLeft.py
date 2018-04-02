@@ -6,24 +6,25 @@ import os
 import json
 from requests import get, post, Session
 from bs4 import BeautifulSoup
-from email import encoders
+from termcolor import *
 from email.header import Header
 from email.mime.text import MIMEText
 from email.utils import parseaddr, formataddr
 import smtplib
 
 url='https://kyfw.12306.cn/otn/leftTicket/queryO?leftTicketDTO.train_date=2018-04-05&leftTicketDTO.from_station=SYT&leftTicketDTO.to_station=GZQ&purpose_codes=ADULT'
-trainNO='Z384'
+trainNO='Z1024'
+
 
 def sent(trainNO, ticketleft):
-    from_addr = '@139.com'
+    from_addr = ''
     password = ''
-    to_addr = '@139.com'
+    to_addr = ''
     smtp_server = 'smtp.139.com'
 
     msg = MIMEText('火车票:%s:硬卧%s' % (trainNO , ticketleft), 'plain', 'utf-8')
-    msg['From'] = '@139.com'
-    msg['To'] = '@139.com'
+    msg['From'] = ''
+    msg['To'] = ''
     msg['Subject'] = Header('%s:硬卧%s'% (trainNO , ticketleft), 'utf-8').encode()
 
     server = smtplib.SMTP_SSL(smtp_server, 465)
@@ -75,7 +76,11 @@ def begin():
             print('第%s次,%s'%(num,localtime))
             time.sleep(5)
         except:
-            print('第%s次出错' % (num))
+            print(colored('第%s次出错,%s' % (num,localtime),'red' ))
+
+            with open('log.txt', 'a') as f:
+                f.write('\n' + '第%s次出错,%s' % (num,localtime) + '\n')
+
             time.sleep(60)
             begin()
 
