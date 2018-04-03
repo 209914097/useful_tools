@@ -1,4 +1,4 @@
-# 只需在url填入json链接，trainNO填入车次，即可返回硬卧票数信息，num不用改
+# 只需在url填json链接，trainNO填车次，date填日期，即可监视硬卧余票信息，num不用改
 
 import time
 import requests
@@ -12,20 +12,24 @@ from email.mime.text import MIMEText
 from email.utils import parseaddr, formataddr
 import smtplib
 
-url='https://kyfw.12306.cn/otn/leftTicket/queryO?leftTicketDTO.train_date=2018-04-05&leftTicketDTO.from_station=SYT&leftTicketDTO.to_station=GZQ&purpose_codes=ADULT'
+url='https://kyfw.12306.cn/otn/leftTicket/queryO?leftTicketDTO.train_date=2018-05-01&leftTicketDTO.from_station=SYT&leftTicketDTO.to_station=GZQ&purpose_codes=ADULT'
+url2=''
+date='5月1号'
+date2=''
 trainNO='Z1024'
+trainNO2='Z666'
 
 
-def sent(trainNO, ticketleft):
-    from_addr = ''
+def sent(trainNO, ticketleft,datetime):
+    from_addr = '.com'
     password = ''
-    to_addr = ''
+    to_addr = '.com'
     smtp_server = 'smtp.139.com'
 
-    msg = MIMEText('火车票:%s:硬卧%s' % (trainNO , ticketleft), 'plain', 'utf-8')
+    msg = MIMEText('火车票:%s硬卧%s' % (trainNO , ticketleft), 'plain', 'utf-8')
     msg['From'] = ''
     msg['To'] = ''
-    msg['Subject'] = Header('%s:硬卧%s'% (trainNO , ticketleft), 'utf-8').encode()
+    msg['Subject'] = Header('%s:硬卧%s:%s'% (trainNO , ticketleft,datetime), 'utf-8').encode()
 
     server = smtplib.SMTP_SSL(smtp_server, 465)
     server.set_debuglevel(1)
@@ -49,22 +53,34 @@ def login():
         if x.find(trainNO)!=-1:
             print(x)
             trainmsg=x.split('|')
-            if trainmsg[28]!='无':sent(trainNO,trainmsg[28]);return 'getit'
+            if trainmsg[28]!='无':sent(trainNO,trainmsg[28],date);return 'getit'
 
-# ------------------------------------------可注释，用于选择同一趟车多日期------------------#
-    time.sleep(5)
-    captchaurl ='https://kyfw.12306.cn/otn/leftTicket/queryO?leftTicketDTO.train_date=2018-04-03&leftTicketDTO.from_station=SYT&leftTicketDTO.to_station=GZQ&purpose_codes=ADULT'
-    session = Session()
-    checkcodecontent = session.get(captchaurl, headers=headers)
-    jsonstr=json.loads(checkcodecontent.text)
-    trainlist=jsonstr['data']['result']
-    for x in trainlist:
-        if x.find(trainNO)!=-1:
+# ------------------------------------------可注释，用于选择同一日期多趟车------------------#
+        if x.find(trainNO2)!=-1:
             print(x)
             trainmsg=x.split('|')
-            if trainmsg[28]!='无':sent(trainNO,trainmsg[28]);return 'getit'
-# ------------------------------------------可注释，用于选择同一趟车多日期------------------#
-
+            if trainmsg[28]!='无':sent(trainNO2,trainmsg[28],date);return 'getit'
+# ------------------------------------------可注释，用于选择同一日期多趟车------------------#
+#
+# # ------------------------------------------可注释，用于选择同一趟车多日期------------------#
+#     time.sleep(5)
+#     captchaurl =url2
+#     session = Session()
+#     checkcodecontent = session.get(captchaurl, headers=headers)
+#     jsonstr=json.loads(checkcodecontent.text)
+#     trainlist=jsonstr['data']['result']
+#     for x in trainlist:
+#         if x.find(trainNO)!=-1:
+#             print(x)
+#             trainmsg=x.split('|')
+#             if trainmsg[28]!='无':sent(trainNO,trainmsg[28],date2);return 'getit'
+# # ------------------------------------------可注释，用于选择同一趟车多日期------------------#
+# # ------------------------------------------可注释，用于选择同一日期多趟车------------------#
+#         if x.find(trainNO2)!=-1:
+#             print(x)
+#             trainmsg=x.split('|')
+#             if trainmsg[28]!='无':sent(trainNO2,trainmsg[28],date2);return 'getit'
+# # ------------------------------------------可注释，用于选择同一日期多趟车------------------#
 
 def begin():
     num = 0
@@ -81,7 +97,7 @@ def begin():
             with open('log.txt', 'a') as f:
                 f.write('\n' + '第%s次出错,%s' % (num,localtime) + '\n')
 
-            time.sleep(60)
+            time.sleep(30)
             begin()
 
 begin()
