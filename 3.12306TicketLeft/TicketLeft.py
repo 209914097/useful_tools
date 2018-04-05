@@ -12,10 +12,10 @@ from email.mime.text import MIMEText
 from email.utils import parseaddr, formataddr
 import smtplib
 
-url='https://kyfw.12306.cn/otn/leftTicket/queryO?leftTicketDTO.train_date=2018-05-03&leftTicketDTO.from_station=GZQ&leftTicketDTO.to_station=SYT&purpose_codes=ADULT'
-url2='https://kyfw.12306.cn/otn/leftTicket/queryO?leftTicketDTO.train_date=2018-05-02&leftTicketDTO.from_station=GZQ&leftTicketDTO.to_station=SYT&purpose_codes=ADULT'
-date='5月3日'
-date2='5月2日'
+url='https://kyfw.12306.cn/otn/leftTicket/queryO?leftTicketDTO.train_date=2018-05-04&leftTicketDTO.from_station=SYT&leftTicketDTO.to_station=GZQ&purpose_codes=ADULT'
+url2='https://kyfw.12306.cn/otn/leftTicket/queryO?leftTicketDTO.train_date=2018-04-29&leftTicketDTO.from_station=SYT&leftTicketDTO.to_station=GZQ&purpose_codes=ADULT'
+date='1月0日'
+date2='0月1日'
 trainNO='Z1024'
 trainNO2='Z666'
 
@@ -106,6 +106,6 @@ def begin():
             with open('log.txt', 'a') as f:
                 f.write('\n' + '第%s次出错,%s' % (numi,localtime) + '\n'+str(sys.exc_info()[0])+str(sys.exc_info()[1]) + '\n')
             time.sleep(30)
-            begin()
-
+            # begin()
+            continue
 begin()
