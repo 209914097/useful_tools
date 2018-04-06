@@ -1,5 +1,5 @@
 # 只需在url填json链接，trainNO填车次，date填日期，即可监视硬卧余票信息，numi不用改
-
+#url2,trainNO2,date2填第二志愿车次信息
 import time
 import requests
 import sys
