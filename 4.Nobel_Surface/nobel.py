@@ -42,7 +42,13 @@ layout = go.Layout(
     #     b=65,
     #     t=90
     # )
-
+    # scene={
+    #     "aspectratio": {
+    #         "x": 1,
+    #         "y": 1,
+    #         "z": 1,
+    #     },
+    # },
 )
 
 fig = go.Figure(data=data, layout=layout)
