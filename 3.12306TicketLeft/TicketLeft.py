@@ -1,5 +1,6 @@
 # 只需在url填json链接，trainNO填车次，date填日期，即可监视硬卧余票信息，numi不用改
 #url2,trainNO2,date2填第二志愿车次信息
+#邮件发送程序执行后，2秒之后远程服务器才发出邮件，1分钟之后才会收到短信提示
 import time
 import requests
 import sys
