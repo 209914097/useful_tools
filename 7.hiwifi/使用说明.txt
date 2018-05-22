@@ -1,0 +1,14 @@
+将使用模块文件拷贝到当前目录下
+在新建的python文件中举个使用例子
+from  hiwifi import wifi
+test = wifi()
+test.scan()
+#test.fire('wwch13')
+
+具有以下方法
+    test.scan()  #扫描SSID，将生成SSID的文本
+    test.diswifi()#断开连接
+    test.conwifi('wwch13','35470al')#连接'wwch13',密码为'35470al'
+    test.fire('wwch13')#破解名字为'wwch13'的wifi，字典采用默认字典
+    test.fire('wwch13','password.txt')#破解名字为'wwch13'的wifi，字典采用路径为'password.txt'字典
+	
