@@ -151,7 +151,10 @@ def ticketbook(msg):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36', }).text,
         "html.parser")
     usemsg = usemsg_html.select('div[class="con"]')
-
+    # -----------------------由于12306网站前端改版，因此修改代码-----------------------#
+    Name=usemsg[2].text
+    ID_Number=usemsg[3].text
+    PhoneNumber=usemsg[17].text
     # -----------------------查票获取secretStr-----------------------#
 
     query_url = url
@@ -230,8 +233,8 @@ def ticketbook(msg):
         'cancel_flag': '2',
         'bed_level_order_num': '000000000000000000000000000000',
         'passengerTicketStr': '%s,0,%s,%s,1,%s,%s,N' % (
-        dictory[seattype],dictory[student], usemsg[1].text, usemsg[5].text, usemsg[17].text),  # %(硬卧，姓名，身份证，手机号)
-        'oldPassengerStr': '%s,1,%s,%s_' % (usemsg[1].text, usemsg[5].text,dictory[student]),
+        dictory[seattype],dictory[student], Name, ID_Number, PhoneNumber),  # %(硬卧，学生票，姓名，身份证，手机号)
+        'oldPassengerStr': '%s,1,%s,3_' % (Name, ID_Number),
         'tour_flag': 'dc',
         'randCode': '',
         'whatsSelect': '1',
@@ -271,8 +274,8 @@ def ticketbook(msg):
     # -----------------------confirmSingleForQueue-----------------------#
     form5_data = {
         'passengerTicketStr': '%s,0,%s,%s,1,%s,%s,N' % (
-        dictory[seattype],dictory[student], usemsg[1].text, usemsg[5].text, usemsg[17].text),  # %(硬卧，姓名，身份证，手机号)
-        'oldPassengerStr': '%s,1,%s,%s_' % (usemsg[1].text, usemsg[5].text,dictory[student]),
+        dictory[seattype],dictory[student], Name, ID_Number, PhoneNumber),  # %(硬卧，学生票， 姓名，身份证，手机号)
+        'oldPassengerStr': '%s,1,%s,3_' % (Name, ID_Number,),
         'randCode': '',
         'purpose_codes': '00',
         'key_check_isChange': key_check_isChange,
