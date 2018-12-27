@@ -131,18 +131,18 @@ def ticketbook(msg):
         'Origin': 'https://kyfw.12306.cn',
         'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36",
         'X-Requested-With': 'XMLHttpRequest', })
-    # -----------------------initMy12306-----------------------#
-    session.get('https://kyfw.12306.cn/otn/index/initMy12306', headers={
+     # -----------------------index.html-登录个人中心---由于12306网站前端改版，因此修改代码--------------------#
+    session.get('https://kyfw.12306.cn/otn/view/index.html', headers={
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
         'Accept-Encoding': 'gzip, deflate,br',
         'Accept-Language': 'zh-CN,zh;q=0.9',
         'Host': 'kyfw.12306.cn',
         'Upgrade-Insecure-Requests': '1',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36', })
-    # -----------------------initQueryUserInfo-----获取个人身份证，手机号信息------------------#
+    # -----------------------https://kyfw.12306.cn/otn/modifyUser/initQueryUserInfoApi-----获取个人身份证，手机号信息---由于12306网站后端改版，因此修改代码---------------#
 
-    usemsg_html = BeautifulSoup(
-        session.post('https://kyfw.12306.cn/otn/modifyUser/initQueryUserInfo', data={'_json_att': ''}, headers={
+    information = BeautifulSoup(
+        session.post('https://kyfw.12306.cn/otn/modifyUser/initQueryUserInfoApi', headers={
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
             'Accept-Encoding': 'gzip, deflate,br',
             'Accept-Language': 'zh-CN,zh;q=0.9',
@@ -150,11 +150,12 @@ def ticketbook(msg):
             'Upgrade-Insecure-Requests': '1',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36', }).text,
         "html.parser")
-    usemsg = usemsg_html.select('div[class="con"]')
+    information.encoding = 'utf-8'#避免汉字乱码
+    information = json.loads(information.text)['data']['userDTO']['loginUserDTO']
     # -----------------------由于12306网站前端改版，因此修改代码-----------------------#
-    Name=usemsg[2].text
-    ID_Number=usemsg[3].text
-    PhoneNumber=usemsg[17].text
+    Name = information['name']  # '肖菲'
+    ID_Number = information['id_no']  # '145481197512497514'
+    PhoneNumber = information['agent_contact']  # '18820052354'
     # -----------------------查票获取secretStr-----------------------#
 
     query_url = url
