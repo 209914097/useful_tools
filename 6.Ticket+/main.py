@@ -30,9 +30,17 @@ msg = {
     'pw': pw12306,
     'student': tickettype,
 }
-flag=ticketbook(msg)
-while (flag=="验证码校验失败"):
-    print(colored('验证码识别出错,正在重试%s' % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())), 'red'))
-    with open('TicketBook_err.txt', 'a') as f:
-        f.write('\n' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '验证码识别出错,正在重试' + '\n')
-    flag =ticketbook(msg)  # 再次登录订票
+while True:
+    try:
+        ticketbook(msg)
+        break
+    except:
+        localtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        print(
+            colored('ticketbook(msg)出错,正在重试 %s\n%s %s' % (localtime, sys.exc_info()[0], sys.exc_info()[1]), 'red'))
+        with open('TicketBook_err.txt', 'a') as f:
+            f.write(
+                '\n' + 'ticketbook(msg)出错,重试,%s' % (localtime) + '\n' + str(sys.exc_info()[0]) + str(
+                    sys.exc_info()[1]) + '\n')
+        time.sleep(1)
+        continue
