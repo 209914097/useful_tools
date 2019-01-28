@@ -4,7 +4,7 @@
 from numpy import *
 import json
 from urllib.parse import unquote, quote
-import os
+import sys
 from requests import get, post, Session
 from bs4 import BeautifulSoup
 import time
@@ -89,7 +89,7 @@ def ticketbook(msg):
     captcha_response = session.post(check_url, data=captcha_data, headers=check_headers)
     print(captcha_response.text)
     if (captcha_response.json()["result_message"]=="验证码校验失败"):
-        return "验证码校验失败"
+        raise Exception("验证码校验失败")
 
     # -----------------------web/login-----------------------#{"result_message":"验证码校验失败","result_code":"5"}
     # print('继续')
@@ -353,12 +353,21 @@ if __name__ == '__main__':
         'student': '成人票',
         }
 
-    flag=ticketbook(msg)
-    while (flag=="验证码校验失败"):
-        print(colored('验证码识别出错,正在重试%s' % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())), 'red'))
-        with open('TicketBook_err.txt', 'a') as f:
-            f.write('\n' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '验证码识别出错,正在重试' + '\n')
-        flag =ticketbook(msg)  # 再次登录订票
+    while True:
+        try:
+            ticketbook(msg)
+            break
+        except:
+            localtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            print(
+                colored('ticketbook(msg)出错,正在重试 %s\n%s %s' % (localtime, sys.exc_info()[0], sys.exc_info()[1]), 'red'))
+            with open('TicketBook_err.txt', 'a') as f:
+                f.write(
+                    '\n' + 'ticketbook(msg)出错,重试,%s' % (localtime) + '\n' + str(sys.exc_info()[0]) + str(
+                        sys.exc_info()[1]) + '\n')
+            time.sleep(1)
+            continue
+
 
 
 
