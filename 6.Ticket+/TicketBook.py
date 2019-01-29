@@ -4,6 +4,7 @@
 from numpy import *
 import json
 from urllib.parse import unquote, quote
+import os
 import sys
 from requests import get, post, Session
 from bs4 import BeautifulSoup
@@ -313,7 +314,7 @@ def ticketbook(msg):
         timr += 1
         if (timr > 20):
             print("超时!" )
-            exit()
+            os._exit(0)
         if (len(orderidall) == 0):
             print("无orderid，重新请求。queryOrderWaitTime:"+ re2.text)
             continue
@@ -352,12 +353,15 @@ if __name__ == '__main__':
         'pw': '12306密码',#敏感信息
         'student': '成人票',
         }
-
+    err_num=0
     while True:
         try:
             ticketbook(msg)
             break
         except:
+            err_num+=1
+            if err_num>=5:
+                os._exit(0)
             localtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             print(
                 colored('ticketbook(msg)出错,正在重试 %s\n%s %s' % (localtime, sys.exc_info()[0], sys.exc_info()[1]), 'red'))
@@ -367,7 +371,6 @@ if __name__ == '__main__':
                         sys.exc_info()[1]) + '\n')
             time.sleep(1)
             continue
-
 
 
 
