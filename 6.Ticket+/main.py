@@ -30,11 +30,15 @@ msg = {
     'pw': pw12306,
     'student': tickettype,
 }
+err_num = 0
 while True:
     try:
         ticketbook(msg)
         break
     except:
+        err_num += 1
+        if err_num >= 5:
+            os._exit(0)
         localtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print(
             colored('ticketbook(msg)出错,正在重试 %s\n%s %s' % (localtime, sys.exc_info()[0], sys.exc_info()[1]), 'red'))
