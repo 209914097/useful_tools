@@ -5,20 +5,21 @@ from TicketBook import *
 from TicketLeft import ticketleft
 
 #---------------------购票信息---------------------#
-url='https://kyfw.12306.cn/otn/leftTicket/query?leftTicketDTO.train_date=2018-06-04&leftTicketDTO.from_station=SBT&leftTicketDTO.to_station=GZQ&purpose_codes=ADULT'
-url2='https://kyfw.12306.cn/otn/leftTicket/query?leftTicketDTO.train_date=2018-05-29&leftTicketDTO.from_station=SBT&leftTicketDTO.to_station=GZQ&purpose_codes=ADULT'
-date='6月4日'
-date2='5月29日'
-trainNO='Z384'
-trainNO2='Z238'
-tickettype='成人票'
-
+url_list = [
+        'https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2019-03-01&leftTicketDTO.from_station=GZQ&leftTicketDTO.to_station=SBT&purpose_codes=ADULT', \
+        'https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2019-02-28&leftTicketDTO.from_station=GZQ&leftTicketDTO.to_station=SBT&purpose_codes=ADULT'
+    ]
+date_list = ['3月1日', '2月28日']
+trainNO_list = ['Z14', 'T122']
+IS_CDN=True
+tickettype='学生票'
 seattype='硬卧'
 use12306=''#敏感信息
 pw12306= ''#敏感信息
 
 #---------------------查票---------------------#
-tk=ticketleft(url,url2,date,date2,trainNO,trainNO2)
+
+tk = ticketleft(url_list, date_list, trainNO_list,IS_CDN)
 tk.query()
 
 #---------------------订票---------------------#
@@ -29,6 +30,7 @@ msg = {
     'use': use12306,
     'pw': pw12306,
     'student': tickettype,
+    'AIcaptcha':True,
 }
 err_num = 0
 while True:
