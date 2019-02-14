@@ -22,6 +22,7 @@ def ticketbook(msg):
     use = msg['use']
     pw = msg['pw']
     student = msg['student']
+    AIcaptcha=msg['AIcaptcha']
 
     # -----------------------可改参数的内部变量-----------------------#
     dictory = {'硬卧': 3, '软卧': 4, '硬座': 1, '一等座': 'M','学生票':'3','成人票':'1'}
@@ -60,16 +61,27 @@ def ticketbook(msg):
     with open('captcha-image.jpg', 'wb') as f:
         f.write(checkcodecontent.content)
 
+    if AIcaptcha:
     # -----------------------验证码"真·人工智能"识别-----------------------#
-    rc = RClient('用户名', '用户密码'.encode("utf-8"), '软件ID', '软件Key')#敏感信息
-    im = open('captcha-image.jpg', 'rb').read()
-    im_num =rc.rk_create(im, 6113)
-    checkcode = [int(x) for x in list(im_num['Result'])]
-    checkcode = pick(checkcode)
+        rc = RClient('用户名', '用户密码'.encode("utf-8"), '软件ID', '软件Key')#敏感信息
+        im = open('captcha-image.jpg', 'rb').read()
+        im_num =rc.rk_create(im, 6113)
+        checkcode = [int(x) for x in list(im_num['Result'])]
+        checkcode = pick(checkcode)
     # -----------------------验证码手动识别-----------------------#
-    # os.startfile('captcha-image.jpg')
-    # checkcode = [int(x) for x in input('输入图片序号用,分隔:').split(',')]
-    # checkcode = pick(checkcode)
+    else:
+        os.startfile('captcha-image.jpg')
+        print(
+            """
+            -----------------
+            | 1 | 2 | 3 | 4 |
+            -----------------
+            | 5 | 6 | 7 | 8 |
+            -----------------
+            """
+        )
+        checkcode = [int(x) for x in input('输入图片序号用,分隔:').split(',')]
+        checkcode = pick(checkcode)
     # -----------------------captcha-check------------提交验证码-----------#
     check_url = 'https://kyfw.12306.cn/passport/captcha/captcha-check'
     check_headers = {
@@ -132,7 +144,7 @@ def ticketbook(msg):
         'Origin': 'https://kyfw.12306.cn',
         'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36",
         'X-Requested-With': 'XMLHttpRequest', })
-     # -----------------------index.html-登录个人中心---由于12306网站前端改版，因此修改代码--------------------#
+    # -----------------------index.html-登录个人中心---由于12306网站前端改版，因此修改代码--------------------#
     session.get('https://kyfw.12306.cn/otn/view/index.html', headers={
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
         'Accept-Encoding': 'gzip, deflate,br',
@@ -314,7 +326,7 @@ def ticketbook(msg):
         timr += 1
         if (timr > 20):
             print("超时!" )
-            os._exit(0)
+            os._exit(0)#这样退出不会抛出异常
         if (len(orderidall) == 0):
             print("无orderid，重新请求。queryOrderWaitTime:"+ re2.text)
             continue
@@ -342,17 +354,22 @@ def ticketbook(msg):
                  headers={
                      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36',
                  })
+    WeChat = Session()
+    response = WeChat.post('https://sc.ftqq.com/秘钥.send',
+                            data={'text': trainNO, 'desp': '订单完成提交', })#敏感信息 微信推送配置http://sc.ftqq.com/3.version
+    # print(json.loads(response.text))
     print("订单已经完成提交，您可以登录后台进行支付了。")
 
 if __name__ == '__main__':
     msg = {
-        'url': 'https://kyfw.12306.cn/otn/leftTicket/query?leftTicketDTO.train_date=2018-05-22&leftTicketDTO.from_station=SBT&leftTicketDTO.to_station=GZQ&purpose_codes=ADULT',
-        'trainNO': 'T122',
+        'url': 'https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2019-02-28&leftTicketDTO.from_station=GZQ&leftTicketDTO.to_station=SBT&purpose_codes=ADULT',
+        'trainNO': 'Z114',
         'seattype': '硬卧',
         'use': '12306账户',#敏感信息
         'pw': '12306密码',#敏感信息
-        'student': '成人票',
-        }
+        'student': '学生票',
+        'AIcaptcha': False,
+    }
     err_num=0
     while True:
         try:
