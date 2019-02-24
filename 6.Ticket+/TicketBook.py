@@ -4,14 +4,13 @@
 from numpy import *
 import json
 from urllib.parse import unquote, quote
-import os
 import sys
-from requests import get, post, Session
+from requests import get, packages, Session
 from bs4 import BeautifulSoup
 import time
 from termcolor import *
 import re
-from rk import RClient
+from LogIn import login
 
 
 
@@ -30,120 +29,8 @@ def ticketbook(msg):
     focitycode = re.findall('from_station=(.+?)&', url)[0]
     tocitycode= re.findall('to_station=(.+?)&', url)[0]
 
-    def pick(num):
-        answer = ''
-        axis = ['37,45', '107,45', '182,45', '252,45',
-                '37,115', '107,115', '182,115', '252,115']
-        for x in num:
-            answer += axis[x - 1] + ','
-        return (answer[:-1])
-
-    # -----------------------https://kyfw.12306.cn/otn/login/init-----------------------#
-    session = Session()
-    session.get('https://kyfw.12306.cn/otn/login/init', headers={
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Encoding': 'gzip, deflate,br',
-        'Accept-Language': 'zh-CN,zh;q=0.9',
-        'Host': 'kyfw.12306.cn',
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36", })
-
-    # -----------------------captcha-image?login_site=E&module=login&rand=sjrand&0.9725909596164388-------下载验证码----------------#
-    captchaurl = 'https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand'
-    captchaheaders = {
-        'Accept': 'image / webp, image / apng, image / *, * / *;q = 0.8',
-        'Accept-Encoding': 'gzip, deflate,br',
-        'Accept-Language': 'zh-CN,zh;q=0.9',
-        'Host': 'kyfw.12306.cn',
-        'Referer': 'https://kyfw.12306.cn/otn/leftTicket/init',
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36",
-    }
-    checkcodecontent = session.get(captchaurl, headers=captchaheaders)
-    with open('captcha-image.jpg', 'wb') as f:
-        f.write(checkcodecontent.content)
-
-    if AIcaptcha:
-    # -----------------------验证码"真·人工智能"识别-----------------------#
-        rc = RClient('用户名', '用户密码'.encode("utf-8"), '软件ID', '软件Key')#敏感信息
-        im = open('captcha-image.jpg', 'rb').read()
-        im_num =rc.rk_create(im, 6113)
-        checkcode = [int(x) for x in list(im_num['Result'])]
-        checkcode = pick(checkcode)
-    # -----------------------验证码手动识别-----------------------#
-    else:
-        os.startfile('captcha-image.jpg')
-        print(
-            """
-            -----------------
-            | 1 | 2 | 3 | 4 |
-            -----------------
-            | 5 | 6 | 7 | 8 |
-            -----------------
-            """
-        )
-        checkcode = [int(x) for x in input('输入图片序号用,分隔:').split(',')]
-        checkcode = pick(checkcode)
-    # -----------------------captcha-check------------提交验证码-----------#
-    check_url = 'https://kyfw.12306.cn/passport/captcha/captcha-check'
-    check_headers = {
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-        'Accept-Encoding': 'gzip, deflate,br',
-        'Accept-Language': 'zh-CN,zh;q=0.9',
-        'Host': 'kyfw.12306.cn',
-        'Origin': 'https://kyfw.12306.cn',
-        'Referer': 'https://kyfw.12306.cn/otn/login/init',
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36",
-        'X-Requested-With': 'XMLHttpRequest',
-    }
-    captcha_data = {
-        'answer': checkcode,
-        'login_site': 'E',
-        'rand': 'sjrand',
-    }
-    captcha_response = session.post(check_url, data=captcha_data, headers=check_headers)
-    print(captcha_response.text)
-    if (captcha_response.json()["result_message"]=="验证码校验失败"):
-        raise Exception("验证码校验失败")
-
-    # -----------------------web/login-----------------------#{"result_message":"验证码校验失败","result_code":"5"}
-    # print('继续')
-
-    login_url = 'https://kyfw.12306.cn/passport/web/login'
-    form_data = {
-        'username': use,
-        'password': pw,
-        'appid': 'otn',
-    }
-    log_response = session.post(login_url, data=form_data, headers=check_headers)
-    print(log_response.text)
-    # -----------------------userLogin-----------------------#
-    session.post('https://kyfw.12306.cn/otn/login/userLogin', data={'_json_att': '', }, headers={
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Encoding': 'gzip, deflate,br',
-        'Accept-Language': 'zh-CN,zh;q=0.9',
-        'Host': 'kyfw.12306.cn',
-        'Upgrade-Insecure-Requests': '1',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36', })
-
-
-    # -----------------------uamtk-----------------------#
-    uamtk_response1 = session.post('https://kyfw.12306.cn/passport/web/auth/uamtk', data={'appid': 'otn', }, headers={
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-        'Accept-Encoding': 'gzip, deflate,br',
-        'Accept-Language': 'zh-CN,zh;q=0.9',
-        'Host': 'kyfw.12306.cn',
-        'Origin': 'https://kyfw.12306.cn',
-        'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36",
-        'X-Requested-With': 'XMLHttpRequest', })
-    tk = json.loads(uamtk_response1.text)["newapptk"]
-    # -----------------------uamauthclient-----------------------#
-    session.post('https://kyfw.12306.cn/otn/uamauthclient', data={'tk': tk, }, headers={
-        'Accept': '*/*',
-        'Accept-Encoding': 'gzip, deflate,br',
-        'Accept-Language': 'zh-CN,zh;q=0.9',
-        'Host': 'kyfw.12306.cn',
-        'Origin': 'https://kyfw.12306.cn',
-        'User-Agent': "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36",
-        'X-Requested-With': 'XMLHttpRequest', })
+    Auth = login(use, pw, AIcaptcha)
+    session = Auth.golog()
     # -----------------------index.html-登录个人中心---由于12306网站前端改版，因此修改代码--------------------#
     session.get('https://kyfw.12306.cn/otn/view/index.html', headers={
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -170,8 +57,8 @@ def ticketbook(msg):
     ID_Number = information['id_no']  # '145481197512497514'
     PhoneNumber = information['agent_contact']  # '18820052354'
     # -----------------------查票获取secretStr-----------------------#
-
     query_url = url
+    packages.urllib3.disable_warnings()
     query_headers = {
         'Accept': '*/*',
         'Accept-Encoding': 'gzip, deflate,br',
@@ -182,7 +69,12 @@ def ticketbook(msg):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36",
         'X-Requested-With': 'XMLHttpRequest',
     }
-    reply = session.get(query_url, headers=query_headers)
+    session.headers.update(query_headers)
+    reply = session.request(method='get',
+                            timeout=4,
+                            url=query_url,
+                            allow_redirects=False,
+                            verify=False)
     jsonstr = json.loads(reply.text)
     trainlist = jsonstr['data']['result']
     fromcity = jsonstr['data']['map'][focitycode]
@@ -266,7 +158,7 @@ def ticketbook(msg):
                            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36',
                            'X-Requested-With': 'XMLHttpRequest', }
 
-    print('confirmPassenger:' + session.post('https://kyfw.12306.cn/otn/confirmPassenger/checkOrderInfo',
+    print('checkOrderInfo:' + session.post('https://kyfw.12306.cn/otn/confirmPassenger/checkOrderInfo',
                                              headers=checkOrderInfo_head, data=form3_data).text)
 
     # -----------------------getQueueCount-----------------------#
@@ -276,7 +168,7 @@ def ticketbook(msg):
         'stationTrainCode': trainmsglist[3],
         'seatType': dictory[seattype],
         'fromStationTelecode': trainmsglist[6],
-        'toStationTelecode': trainmsglist[5],
+        'toStationTelecode': trainmsglist[7],
         'leftTicket': trainmsglist[12],
         'purpose_codes': '00',
         'train_location': trainmsglist[15],
@@ -345,7 +237,7 @@ def ticketbook(msg):
                      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36',
                  })
 
-    #-------------------------------------resultOrderForDcQueue---------------#
+    #-------------------------------------payOrder/init---------------#
     session.post('https://kyfw.12306.cn/otn//payOrder/init',
                  data={
                      '_json_att':'',
@@ -356,13 +248,13 @@ def ticketbook(msg):
                  })
     WeChat = Session()
     response = WeChat.post('https://sc.ftqq.com/秘钥.send',
-                            data={'text': trainNO, 'desp': '订单完成提交', })#敏感信息 微信推送配置http://sc.ftqq.com/3.version
+                            data={'text': trainNO+'订单完成提交', 'desp': '订单完成提交', })#Server酱,微信推送配置http://sc.ftqq.com/3.version
     # print(json.loads(response.text))
     print("订单已经完成提交，您可以登录后台进行支付了。")
 
 if __name__ == '__main__':
     msg = {
-        'url': 'https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2019-02-28&leftTicketDTO.from_station=GZQ&leftTicketDTO.to_station=SBT&purpose_codes=ADULT',
+        'url': 'https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2019-03-15&leftTicketDTO.from_station=GZQ&leftTicketDTO.to_station=SYT&purpose_codes=ADULT',
         'trainNO': 'Z114',
         'seattype': '硬卧',
         'use': '12306账户',#敏感信息
