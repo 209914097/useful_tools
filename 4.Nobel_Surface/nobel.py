@@ -1,5 +1,5 @@
 from PIL import Image,ImageFilter
-
+//'https://plot.ly/~jackp/5551/#/plot'
 img = Image.open('nuo.jpg')
 img.convert('L').save('gray.jpg')
 img = Image.open('gray.jpg')
