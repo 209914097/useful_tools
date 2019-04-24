@@ -12,12 +12,15 @@ url_list = [
 date_list = ['2月24日', '2月23日']
 trainNO_list = ['6261', '6265']
 IS_CDN=True
+IS_AIcaptcha=False #True 自动识别验证码, False 手动识别验证码
 tickettype='学生票'
 seattype='硬卧'
 use12306=''#敏感信息
 pw12306= ''#敏感信息
 IS_TicketBook=False#是订票还是捡漏改签
 sequence_no= 'E128932057'#捡漏改签填入要改签的订单号
+IS_changeTS=False  #True ‘变更到站’改签出发日期,车次,到站必须不同 False‘改签’仅改签出发日期和车次
+
 
 
 #---------------------查票---------------------#
@@ -34,7 +37,7 @@ if IS_TicketBook:
         'use': use12306,
         'pw': pw12306,
         'student': tickettype,
-        'AIcaptcha':False,
+        'AIcaptcha':IS_AIcaptcha,
     }
     err_num = 0
     while True:
@@ -62,8 +65,8 @@ elif not IS_TicketBook:
             'sequence_no':sequence_no,#订单号
             'use': use12306,
             'pw': pw12306,
-            'AIcaptcha': False,
-            'changeTSFlag': False,#True ‘变更到站’改签出发日期,车次,到站必须不同 False‘改签’仅改签出发日期和车次
+            'AIcaptcha': IS_AIcaptcha,
+            'changeTSFlag': IS_changeTS,#True ‘变更到站’改签出发日期,车次,到站必须不同 False‘改签’仅改签出发日期和车次
         }
     err_num=0
     while True:
