@@ -26,7 +26,15 @@ class login:
             'Accept-Language': 'zh-CN,zh;q=0.9',
             'Host': 'kyfw.12306.cn',
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36", })
-
+        # -----------------------https://kyfw.12306.cn/otn/HttpZF/logdevice?-----------------------#
+        RAIL_DEVICEID=self.session.get('https://kyfw.12306.cn/otn/HttpZF/logdevice?algID=pKLII3uPX6&hashCode=BgallKZtsTeM_GGfGVe3d559Qrrq-Hvw1Dibmj7s8Ro&FMQw=0&q4f3=zh-CN&VySQ=FGF1IEufT3O2t01Huu8aoSHcpOMqDxQT&VPIf=1&custID=133&VEek=unknown&dzuS=0&yD16=0&EOQP=8f58b1186770646318a429cb33977d8c&lEnu=2886991894&jp76=52d67b2a5aa5e031084733d5006cc664&hAqN=Win32&platform=WEB&ks0Q=d22ca0b81584fbea62237b14bd04c866&TeRS=1040x1920&tOHY=24xx1080x1920&Fvje=i1l1o1s1&q5aJ=-8&wNLf=99115dfb07133750ba677d055874de87&0aew=Mozilla/5.0%20(Windows%20NT%206.1;%20Win64;%20x64)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/72.0.3626.121%20Safari/537.36&E3gR=982178053f420f9b3bc3a6c108acf9ae', headers={
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate,br',
+            'Accept-Language': 'zh-CN,zh;q=0.9',
+            'Host': 'kyfw.12306.cn',
+            "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36", }).text
+        RAIL_DEVICEID = re.findall('"dfp":"(.+?)"}', RAIL_DEVICEID)[0]
+        self.session.cookies.set('RAIL_DEVICEID',RAIL_DEVICEID,domain='.12306.cn')
         # -----------------------captcha-image?login_site=E&module=login&rand=sjrand&0.9725909596164388-------下载验证码----------------#
         captchaurl = 'https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand'
         captchaheaders = {
